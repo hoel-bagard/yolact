@@ -163,6 +163,9 @@ class Resize(object):
             else:
                 masks = masks.transpose((2, 0, 1))
 
+            # Quick fix
+            boxes=boxes.astype("float64")
+
             # Scale bounding boxes (which are currently absolute coordinates)
             boxes[:, [0, 2]] *= (width  / img_w)
             boxes[:, [1, 3]] *= (height / img_h)
