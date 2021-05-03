@@ -44,11 +44,11 @@ COCO_CLASSES = ('person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
                 'scissors', 'teddy bear', 'hair drier', 'toothbrush')
 
 
-# CLIENT_CLASSES = ("Thread", )
+# CLIENT_CLASSES = ("thread", )
 # CLIENT_LABEL_MAP = {1: 1}
 
 
-CLIENT_CLASSES = ('Thread', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
+CLIENT_CLASSES = ('thread', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
                 'train', 'truck', 'boat', 'traffic light', 'fire hydrant',
                 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog',
                 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe',
