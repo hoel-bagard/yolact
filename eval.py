@@ -123,7 +123,7 @@ def parse_args(argv=None):
 
     if args.output_web_json:
         args.output_coco_json = True
-    
+
     if args.seed is not None:
         random.seed(args.seed)
 
@@ -142,7 +142,7 @@ def prep_display(dets_out, img, h, w, undo_transform=True, class_color=False, ma
     else:
         img_gpu = img / 255.0
         h, w, _ = img.shape
-    
+
     with timer.env('Postprocess'):
         save = cfg.rescore_bbox
         cfg.rescore_bbox = True
@@ -153,7 +153,7 @@ def prep_display(dets_out, img, h, w, undo_transform=True, class_color=False, ma
 
     with timer.env('Copy'):
         idx = t[1].argsort(0, descending=True)[:args.top_k]
-        
+
         if cfg.eval_mask_branch:
             # Masks are drawn on the GPU, so don't copy
             masks = t[3][idx]
@@ -170,7 +170,7 @@ def prep_display(dets_out, img, h, w, undo_transform=True, class_color=False, ma
     def get_color(j, on_gpu=None):
         global color_cache
         color_idx = (classes[j] * 5 if class_color else j * 5) % len(COLORS)
-        
+
         if on_gpu is not None and color_idx in color_cache[on_gpu]:
             return color_cache[on_gpu][color_idx]
         else:
@@ -189,14 +189,14 @@ def prep_display(dets_out, img, h, w, undo_transform=True, class_color=False, ma
     if args.display_masks and cfg.eval_mask_branch and num_dets_to_consider > 0:
         # After this, mask is of size [num_dets, h, w, 1]
         masks = masks[:num_dets_to_consider, :, :, None]
-        
+
         # Prepare the RGB images for each mask given their color (size [num_dets, h, w, 1])
         colors = torch.cat([get_color(j, on_gpu=img_gpu.device.index).view(1, 1, 1, 3) for j in range(num_dets_to_consider)], dim=0)
         masks_color = masks.repeat(1, 1, 1, 3) * colors * mask_alpha
 
         # This is 1 everywhere except for 1-mask_alpha where the mask is
         inv_alph_masks = masks * (-mask_alpha) + 1
-        
+
         # I did the math for this on pen and paper. This whole block should be equivalent to:
         #    for j in range(num_dets_to_consider):
         #        img_gpu = img_gpu * inv_alph_masks[j] + masks_color[j]
@@ -207,17 +207,16 @@ def prep_display(dets_out, img, h, w, undo_transform=True, class_color=False, ma
             masks_color_summand += masks_color_cumul.sum(dim=0)
 
         img_gpu = img_gpu * inv_alph_masks.prod(dim=0) + masks_color_summand
-    
+
     if args.display_fps:
-            # Draw the box for the fps on the GPU
+        # Draw the box for the fps on the GPU
         font_face = cv2.FONT_HERSHEY_DUPLEX
         font_scale = 0.6
         font_thickness = 1
 
         text_w, text_h = cv2.getTextSize(fps_str, font_face, font_scale, font_thickness)[0]
 
-        img_gpu[0:text_h+8, 0:text_w+8] *= 0.6 # 1 - Box alpha
-
+        img_gpu[0:text_h+8, 0:text_w+8] *= 0.6  # 1 - Box alpha
 
     # Then draw the stuff that needs to be done on the cpu
     # Note, make sure this is a uint8 tensor or opencv will not anti alias text for whatever reason
@@ -229,7 +228,7 @@ def prep_display(dets_out, img, h, w, undo_transform=True, class_color=False, ma
         text_color = [255, 255, 255]
 
         cv2.putText(img_numpy, fps_str, text_pt, font_face, font_scale, text_color, font_thickness, cv2.LINE_AA)
-    
+
     if num_dets_to_consider == 0:
         return img_numpy
 
@@ -257,9 +256,9 @@ def prep_display(dets_out, img, h, w, undo_transform=True, class_color=False, ma
 
                 cv2.rectangle(img_numpy, (x1, y1), (x1 + text_w, y1 - text_h - 4), color, -1)
                 cv2.putText(img_numpy, text_str, text_pt, font_face, font_scale, text_color, font_thickness, cv2.LINE_AA)
-            
-    
+
     return img_numpy
+
 
 def prep_benchmark(dets_out, h, w):
     with timer.env('Postprocess'):
@@ -328,7 +327,7 @@ class Detections:
             'segmentation': rle,
             'score': float(score)
         })
-    
+
     def dump(self):
         dump_arguments = [
             (self.bbox_data, args.bbox_det_file),
@@ -338,7 +337,7 @@ class Detections:
         for data, path in dump_arguments:
             with open(path, 'w') as f:
                 json.dump(data, f)
-    
+
     def dump_web(self):
         """ Dumps it in the format for my web app. Warning: bad code ahead! """
         config_outs = ['preserve_aspect_ratio', 'use_prediction_module',
@@ -369,14 +368,13 @@ class Detections:
 
         with open(os.path.join(args.web_det_path, '%s.json' % cfg.name), 'w') as f:
             json.dump(output, f)
-        
 
-        
 
 def _mask_iou(mask1, mask2, iscrowd=False):
     with timer.env('Mask IoU'):
         ret = mask_iou(mask1, mask2, iscrowd)
     return ret.cpu()
+
 
 def _bbox_iou(bbox1, bbox2, iscrowd=False):
     with timer.env('BBox IoU'):
@@ -592,13 +590,13 @@ def badhash(x):
     x =  ((x >> 16) ^ x) & 0xFFFFFFFF
     return x
 
-def evalimage(net:Yolact, path:str, save_path:str=None):
+def evalimage(net: Yolact, path: str, save_path: str = None):
     frame = torch.from_numpy(cv2.imread(path)).cuda().float()
     batch = FastBaseTransform()(frame.unsqueeze(0))
     preds = net(batch)
 
     img_numpy = prep_display(preds, frame, None, None, undo_transform=False)
-    
+
     if save_path is None:
         img_numpy = img_numpy[:, :, (2, 1, 0)]
 
@@ -609,12 +607,12 @@ def evalimage(net:Yolact, path:str, save_path:str=None):
     else:
         cv2.imwrite(save_path, img_numpy)
 
-def evalimages(net:Yolact, input_folder:str, output_folder:str):
+def evalimages(net: Yolact, input_folder: str, output_folder: str):
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
 
     print()
-    for p in Path(input_folder).glob('*'): 
+    for p in Path(input_folder).glob('*'):
         path = str(p)
         name = os.path.basename(path)
         name = '.'.join(name.split('.')[:-1]) + '.png'
@@ -633,7 +631,7 @@ class CustomDataParallel(torch.nn.DataParallel):
         # Note that I don't actually want to convert everything to the output_device
         return sum(outputs, [])
 
-def evalvideo(net:Yolact, path:str, out_path:str=None):
+def evalvideo(net: Yolact, path: str, out_path: str = None):
     # If the path is a digit, parse it as a webcam index
     is_webcam = path.isdigit()
     
@@ -867,7 +865,7 @@ def evalvideo(net:Yolact, path:str, out_path:str=None):
     
     cleanup_and_exit()
 
-def evaluate(net:Yolact, dataset, train_mode=False):
+def evaluate(net: Yolact, dataset, train_mode=False):
     net.detect.use_fast_nms = args.fast_nms
     net.detect.use_cross_class_nms = args.cross_class_nms
     cfg.mask_proto_debug = args.mask_proto_debug
@@ -910,7 +908,7 @@ def evaluate(net:Yolact, dataset, train_mode=False):
         timer.disable('Load Data')
 
     dataset_indices = list(range(len(dataset)))
-    
+
     if args.shuffle:
         random.shuffle(dataset_indices)
     elif not args.no_sort:
@@ -954,12 +952,12 @@ def evaluate(net:Yolact, dataset, train_mode=False):
                 prep_benchmark(preds, h, w)
             else:
                 prep_metrics(ap_data, preds, img, gt, gt_masks, h, w, num_crowd, dataset.ids[image_idx], detections)
-            
+
             # First couple of images take longer because we're constructing the graph.
             # Since that's technically initialization, don't include those in the FPS calculations.
             if it > 1:
                 frame_times.add(timer.total_time())
-            
+
             if args.display:
                 if it > 1:
                     print('Avg FPS: %.4f' % (1 / frame_times.get_avg()))
@@ -1032,7 +1030,7 @@ def calc_map(ap_data):
     return all_maps
 
 def print_maps(all_maps):
-    # Warning: hacky 
+    # Warning: hacky
     make_row = lambda vals: (' %5s |' * len(vals)) % tuple(vals)
     make_sep = lambda n:  ('-------+' * n)
 
@@ -1091,7 +1089,7 @@ if __name__ == '__main__':
                                     transform=BaseTransform(), has_gt=cfg.dataset.has_gt)
             prep_coco_cats()
         else:
-            dataset = None        
+            dataset = None
 
         print('Loading model...', end='')
         net = Yolact()

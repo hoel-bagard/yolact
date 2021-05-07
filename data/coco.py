@@ -164,6 +164,8 @@ class COCODetection(data.Dataset):
             # Pool all the masks for this image into one [num_objects,height,width] matrix
 
             # Debug
+            # Seems like some annotations aren't accepted for some reason....
+            # Just remove them manually
             # for obj in target:
             #     try:
             #         self.coco.annToMask(obj).reshape(-1)
