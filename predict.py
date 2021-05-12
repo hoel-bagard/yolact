@@ -123,11 +123,8 @@ class YolactK:
 
                     if self.output_dir_path:
                         # Add the mask to the image
-                        # img[masks[detection_index].astype(np.uint8)] = (0, 0, 255)
-                        for i in range(img.shape[0]):
-                            for j in range(img.shape[1]):
-                                if masks[detection_index, i, j]:
-                                    img[i][j] = (0, 0, 255)
+                        color = np.random.random(3)*255  # (0, 0, 255)
+                        img[masks[detection_index].astype(np.bool8)] = color
 
                     # Get the point on the mask that is the closest to the bounding box's center
                     # Super inefficient but should work so....
