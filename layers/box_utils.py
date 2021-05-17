@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import torch
-from utils import timer
 
-from data import cfg
+from ..data import cfg
+
 
 @torch.jit.script
 def point_form(boxes):
@@ -26,8 +26,9 @@ def center_size(boxes):
     Return:
         boxes: (tensor) Converted xmin, ymin, xmax, ymax form of boxes.
     """
-    return torch.cat(( (boxes[:, 2:] + boxes[:, :2])/2,     # cx, cy
-                        boxes[:, 2:] - boxes[:, :2]  ), 1)  # w, h
+    return torch.cat(((boxes[:, 2:] + boxes[:, :2])/2,     # cx, cy
+                      boxes[:, 2:] - boxes[:, :2]), 1)  # w, h
+
 
 @torch.jit.script
 def intersect(box_a, box_b):
@@ -51,7 +52,7 @@ def intersect(box_a, box_b):
     return torch.clamp(max_xy - min_xy, min=0).prod(3)  # inter
 
 
-def jaccard(box_a, box_b, iscrowd:bool=False):
+def jaccard(box_a, box_b, iscrowd: bool = False):
     """Compute the jaccard overlap of two sets of boxes.  The jaccard overlap
     is simply the intersection over union of two boxes.  Here we operate on
     ground truth boxes and default boxes. If iscrowd=True, put the crowd in box_b.

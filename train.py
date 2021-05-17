@@ -4,7 +4,7 @@ from utils.functions import MovingAverage, SavePath
 from utils.logger import Log
 from utils import timer
 from layers.modules import MultiBoxLoss
-from yolact import Yolact
+from yolact_net import Yolact
 import os
 import sys
 import time

@@ -1,12 +1,13 @@
-import torch
-from torchvision import transforms
+from math import sqrt
+import types
+
 import cv2
 import numpy as np
-import types
 from numpy import random
-from math import sqrt
+import torch
+import torch.nn.functional as F
 
-from data import cfg, MEANS, STD
+from ..data import cfg, MEANS, STD
 
 
 def intersect(box_a, box_b):
@@ -614,7 +615,6 @@ class BaseTransform(object):
     def __call__(self, img, masks=None, boxes=None, labels=None):
         return self.augment(img, masks, boxes, labels)
 
-import torch.nn.functional as F
 
 class FastBaseTransform(torch.nn.Module):
     """
@@ -627,18 +627,18 @@ class FastBaseTransform(torch.nn.Module):
         super().__init__()
 
         self.mean = torch.Tensor(MEANS).float().cuda()[None, :, None, None]
-        self.std  = torch.Tensor( STD ).float().cuda()[None, :, None, None]
+        self.std = torch.Tensor( STD ).float().cuda()[None, :, None, None]
         self.transform = cfg.backbone.transform
 
     def forward(self, img):
         self.mean = self.mean.to(img.device)
-        self.std  = self.std.to(img.device)
-        
+        self.std = self.std.to(img.device)
+
         # img assumed to be a pytorch BGR image with channel order [n, h, w, c]
         if cfg.preserve_aspect_ratio:
             _, h, w, _ = img.size()
             img_size = Resize.calc_size_preserve_ar(w, h, cfg.max_size)
-            img_size = (img_size[1], img_size[0]) # Pytorch needs h, w
+            img_size = (img_size[1], img_size[0])  # Pytorch needs h, w
         else:
             img_size = (cfg.max_size, cfg.max_size)
 
@@ -651,14 +651,15 @@ class FastBaseTransform(torch.nn.Module):
             img = (img - self.mean)
         elif self.transform.to_float:
             img = img / 255
-        
+
         if self.transform.channel_order != 'RGB':
             raise NotImplementedError
-        
+
         img = img[:, (2, 1, 0), :, :].contiguous()
 
         # Return value is in channel order [n, c, h, w] and RGB
         return img
+
 
 def do_nothing(img=None, masks=None, boxes=None, labels=None):
     return img, masks, boxes, labels
@@ -666,6 +667,7 @@ def do_nothing(img=None, masks=None, boxes=None, labels=None):
 
 def enable_if(condition, obj):
     return obj if condition else do_nothing
+
 
 class SSDAugmentation(object):
     """ Transform to be used when training. """

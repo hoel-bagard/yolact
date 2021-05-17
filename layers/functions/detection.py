@@ -1,11 +1,9 @@
-import torch
-import torch.nn.functional as F
-from ..box_utils import decode, jaccard, index2d
-from utils import timer
-
-from data import cfg, mask_type
-
 import numpy as np
+import torch
+
+from ...utils import timer
+from ...data import cfg
+from ..box_utils import decode, jaccard
 
 
 class Detect(object):
@@ -25,7 +23,7 @@ class Detect(object):
         if nms_thresh <= 0:
             raise ValueError('nms_threshold must be non negative.')
         self.conf_thresh = conf_thresh
-        
+
         self.use_cross_class_nms = False
         self.use_fast_nms = False
 
@@ -42,7 +40,7 @@ class Detect(object):
                 Shape: [num_priors, 4]
             proto_data: (tensor) If using mask_type.lincomb, the prototype masks
                 Shape: [batch, mask_h, mask_w, mask_dim]
-        
+
         Returns:
             output of shape (batch_size, top_k, 1 + 1 + 4 + mask_dim)
             These outputs are in the order: class idx, confidence, bbox coords, and mask.

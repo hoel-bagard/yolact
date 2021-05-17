@@ -8,25 +8,28 @@ try:
     from dcn_v2 import DCN
 except ImportError:
     def DCN(*args, **kwdargs):
-        raise Exception('DCN could not be imported. If you want to use YOLACT++ models, compile DCN. Check the README for instructions.')
+        raise Exception("DCN could not be imported. If you want to use YOLACT++ models, compile DCN."
+                        "Check the README for instructions.")
+
 
 class Bottleneck(nn.Module):
     """ Adapted from torchvision.models.resnet """
     expansion = 4
 
-    def __init__(self, inplanes, planes, stride=1, downsample=None, norm_layer=nn.BatchNorm2d, dilation=1, use_dcn=False):
+    def __init__(self, inplanes, planes, stride=1, downsample=None, norm_layer=nn.BatchNorm2d,
+                 dilation=1, use_dcn=False):
         super(Bottleneck, self).__init__()
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False, dilation=dilation)
         self.bn1 = norm_layer(planes)
         if use_dcn:
             self.conv2 = DCN(planes, planes, kernel_size=3, stride=stride,
-                                padding=dilation, dilation=dilation, deformable_groups=1)
+                             padding=dilation, dilation=dilation, deformable_groups=1)
             self.conv2.bias.data.zero_()
             self.conv2.conv_offset_mask.weight.data.zero_()
             self.conv2.conv_offset_mask.bias.data.zero_()
         else:
             self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride,
-                                padding=dilation, bias=False, dilation=dilation)
+                                   padding=dilation, bias=False, dilation=dilation)
         self.bn2 = norm_layer(planes)
         self.conv3 = nn.Conv2d(planes, planes * 4, kernel_size=1, bias=False, dilation=dilation)
         self.bn3 = norm_layer(planes * 4)

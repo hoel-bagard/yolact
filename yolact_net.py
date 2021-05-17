@@ -1,21 +1,19 @@
-import torch, torchvision
-import torch.nn as nn
-import torch.nn.functional as F
-from torchvision.models.resnet import Bottleneck
-import numpy as np
 from itertools import product
 from math import sqrt
 from typing import List
 from collections import defaultdict
 
-from data.config import cfg, mask_type
-from layers import Detect
-from layers.interpolate import InterpolateModule
-from backbone import construct_backbone
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torchvision.models.resnet import Bottleneck
+import numpy as np
 
-import torch.backends.cudnn as cudnn
-from utils import timer
-from utils.functions import MovingAverage, make_net
+from .data.config import cfg, mask_type
+from .layers import Detect
+from .backbone import construct_backbone
+from .utils import timer
+from .utils.functions import MovingAverage, make_net
 
 # This is required for Pytorch 1.0.1 on Windows to initialize Cuda on some driver versions.
 # See the bug report here: https://github.com/pytorch/pytorch/issues/17108
@@ -30,19 +28,20 @@ ScriptModuleWrapper = torch.jit.ScriptModule if use_jit else nn.Module
 script_method_wrapper = torch.jit.script_method if use_jit else lambda fn, _rcn=None: fn
 
 
-
 class Concat(nn.Module):
     def __init__(self, nets, extra_params):
         super().__init__()
 
         self.nets = nn.ModuleList(nets)
         self.extra_params = extra_params
-    
+
     def forward(self, x):
         # Concat each along the channel dimension
         return torch.cat([net(x) for net in self.nets], dim=1, **self.extra_params)
 
+
 prior_cache = defaultdict(lambda: None)
+
 
 class PredictionModule(nn.Module):
     """

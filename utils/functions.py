@@ -1,10 +1,12 @@
-import torch
-import torch.nn as nn
 import os
 import math
 from collections import deque
 from pathlib import Path
-from layers.interpolate import InterpolateModule
+
+import torch.nn as nn
+
+from ..layers.interpolate import InterpolateModule
+
 
 class MovingAverage():
     """ Keeps an average window of the specified number of items. """
@@ -18,13 +20,13 @@ class MovingAverage():
         if not math.isfinite(elem):
             print('Warning: Moving average ignored a value of %f' % elem)
             return
-        
+
         self.window.append(elem)
         self.sum += elem
 
         if len(self.window) > self.max_window_size:
             self.sum -= self.window.popleft()
-    
+
     def append(self, elem):
         """ Same as add just more pythonic. """
         self.add(elem)
@@ -40,10 +42,10 @@ class MovingAverage():
 
     def __str__(self):
         return str(self.get_avg())
-    
+
     def __repr__(self):
         return repr(self.get_avg())
-    
+
     def __len__(self):
         return len(self.window)
 
@@ -55,7 +57,7 @@ class ProgressBar():
         self.max_val = max_val
         self.length = length
         self.cur_val = 0
-        
+
         self.cur_num_bars = -1
         self._update_str()
 

@@ -7,7 +7,7 @@ import cv2
 import torch
 import numpy as np
 
-from yolact import Yolact
+from .yolact_net import Yolact
 from utils.augmentations import FastBaseTransform
 from layers.output_utils import postprocess
 from data import cfg, set_cfg

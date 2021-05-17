@@ -3,9 +3,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
-from ..box_utils import match, log_sum_exp, decode, center_size, crop, elemwise_mask_iou, elemwise_box_iou
 
-from data import cfg, mask_type, activation_func
+from ..box_utils import match, log_sum_exp, decode, center_size, crop, elemwise_box_iou
+from ...data import cfg, mask_type, activation_func
+
 
 class MultiBoxLoss(nn.Module):
     """SSD Weighted Loss Function
@@ -33,7 +34,7 @@ class MultiBoxLoss(nn.Module):
     def __init__(self, num_classes, pos_threshold, neg_threshold, negpos_ratio):
         super(MultiBoxLoss, self).__init__()
         self.num_classes = num_classes
-        
+
         self.pos_threshold = pos_threshold
         self.neg_threshold = neg_threshold
         self.negpos_ratio = negpos_ratio

@@ -1,33 +1,31 @@
-from data import COCODetection, get_label_map, MEANS, COLORS
-from yolact import Yolact
-from utils.augmentations import BaseTransform, FastBaseTransform, Resize
-from utils.functions import MovingAverage, ProgressBar
-from layers.box_utils import jaccard, center_size, mask_iou
-from utils import timer
-from utils.functions import SavePath
-from layers.output_utils import postprocess, undo_image_transformation
-import pycocotools
-
-from data import cfg, set_cfg, set_dataset
-
-import numpy as np
-import torch
-import torch.backends.cudnn as cudnn
-from torch.autograd import Variable
 import argparse
 import time
 import random
-import cProfile
 import pickle
 import json
 import os
 from collections import defaultdict
 from pathlib import Path
 from collections import OrderedDict
-from PIL import Image
 
+from data import cfg, set_cfg, set_dataset
+import numpy as np
+import torch
+import torch.backends.cudnn as cudnn
+from torch.autograd import Variable
 import matplotlib.pyplot as plt
 import cv2
+import pycocotools
+
+from data import COCODetection, get_label_map, COLORS
+from yolact_net import Yolact
+from utils.augmentations import BaseTransform, FastBaseTransform
+from utils.functions import MovingAverage, ProgressBar
+from layers.box_utils import jaccard, mask_iou
+from utils import timer
+from utils.functions import SavePath
+from layers.output_utils import postprocess, undo_image_transformation
+
 
 def str2bool(v):
     if v.lower() in ('yes', 'true', 't', 'y', '1'):
@@ -36,6 +34,7 @@ def str2bool(v):
         return False
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
+
 
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(
