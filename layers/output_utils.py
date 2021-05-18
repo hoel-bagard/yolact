@@ -1,16 +1,13 @@
 """ Contains functions used to sanitize and prepare the output of Yolact. """
-
-
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 import cv2
 
-from data import cfg, mask_type, MEANS, STD, activation_func
-from utils.augmentations import Resize
-from utils import timer
+from ..data import cfg, mask_type, MEANS, STD, activation_func
+from ..utils import timer
 from .box_utils import crop, sanitize_coordinates
+
 
 def postprocess(det_output, w, h, batch_idx=0, interpolation_mode='bilinear',
                 visualize_lincomb=False, crop_masks=True, score_threshold=0):
@@ -31,7 +28,7 @@ def postprocess(det_output, w, h, batch_idx=0, interpolation_mode='bilinear',
         - boxes   [num_det, 4]: The bounding box for each detection in absolute point form.
         - masks   [num_det, h, w]: Full image masks for each detection.
     """
-    
+
     dets = det_output[batch_idx]
     net = dets['net']
     dets = dets['detection']
@@ -45,10 +42,10 @@ def postprocess(det_output, w, h, batch_idx=0, interpolation_mode='bilinear',
         for k in dets:
             if k != 'proto':
                 dets[k] = dets[k][keep]
-        
+
         if dets['score'].size(0) == 0:
             return [torch.Tensor()] * 4
-    
+
     # Actually extract everything from dets now
     classes = dets['class']
     boxes   = dets['box']
@@ -58,11 +55,11 @@ def postprocess(det_output, w, h, batch_idx=0, interpolation_mode='bilinear',
     if cfg.mask_type == mask_type.lincomb and cfg.eval_mask_branch:
         # At this points masks is only the coefficients
         proto_data = dets['proto']
-        
+
         # Test flag, do not upvote
         if cfg.mask_proto_debug:
             np.save('scripts/proto.npy', proto_data.cpu().numpy())
-        
+
         if visualize_lincomb:
             display_lincomb(proto_data, masks)
 

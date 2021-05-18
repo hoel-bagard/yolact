@@ -9,11 +9,11 @@ import torch.nn.functional as F
 from torchvision.models.resnet import Bottleneck
 import numpy as np
 
-from .data.config import cfg, mask_type
-from .layers import Detect
-from .backbone import construct_backbone
-from .utils import timer
-from .utils.functions import MovingAverage, make_net
+from yolact.data.config import cfg, mask_type
+from yolact.layers import Detect
+from yolact.backbone import construct_backbone
+from yolact.utils import timer
+from yolact.utils.functions import MovingAverage, make_net
 
 # This is required for Pytorch 1.0.1 on Windows to initialize Cuda on some driver versions.
 # See the bug report here: https://github.com/pytorch/pytorch/issues/17108
@@ -68,7 +68,7 @@ class PredictionModule(nn.Module):
         - parent:        If parent is a PredictionModule, this module will use all the layers
                          from parent instead of from this module.
     """
-    
+
     def __init__(self, in_channels, out_channels=1024, aspect_ratios=[[1]], scales=[1], parent=None, index=0):
         super().__init__()
 

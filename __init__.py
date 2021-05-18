@@ -1,4 +1,4 @@
 from .predict import YolactK
-from .yolact_net import *
+from .data import *
 
 __version__ = "0.1.0"

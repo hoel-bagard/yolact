@@ -2,7 +2,7 @@ from math import sqrt
 
 import torch
 
-from ..backbone import ResNetBackbone, VGGBackbone, ResNetBackboneGN, DarkNetBackbone
+from yolact.backbone import ResNetBackbone, VGGBackbone, ResNetBackboneGN, DarkNetBackbone
 
 # for making bounding boxes pretty
 COLORS = ((244,  67,  54),

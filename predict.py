@@ -7,10 +7,10 @@ import cv2
 import torch
 import numpy as np
 
-from .yolact_net import Yolact
-from utils.augmentations import FastBaseTransform
-from layers.output_utils import postprocess
-from data import cfg, set_cfg
+from yolact.yolact_net import Yolact
+from yolact.utils.augmentations import FastBaseTransform
+from yolact.layers.output_utils import postprocess
+from yolact.data import cfg, set_cfg
 
 
 def clean_print(msg: str, fallback: Optional[Tuple[int, int]] = (156, 38), end='\n'):
@@ -79,7 +79,7 @@ class YolactK:
             imgs = np.expand_dims(imgs, axis=0)
             img_paths = np.expand_dims(img_paths, axis=0) if img_paths else None
         if img_paths is None:
-            img_paths = list(np.range(len(imgs)))
+            img_paths = list(np.arange(len(imgs)))
 
         list_of_centers = []
 
@@ -203,8 +203,8 @@ def main():
 
     yolact_k = YolactK(checkpoint_path=args.trained_model, config=args.config, output_dir_path=args.output_dir_path,
                        use_gpu=args.use_gpu, verbose=args.verbose)
-
-    img_paths = list(data_path.rglob("*.jpg"))
+    exts = [".jpg", ".png"]
+    img_paths = list([p for p in data_path.rglob("*") if p.suffix in exts])
     nb_imgs = len(img_paths)
     for img_index, img_path in enumerate(img_paths):
         clean_print(f"Processing image: {img_path} ({img_index+1}/{nb_imgs})", end="\n" if args.verbose else "\r")
