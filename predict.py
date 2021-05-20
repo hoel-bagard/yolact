@@ -9,6 +9,7 @@ import numpy as np
 
 from yolact.yolact_net import Yolact
 from yolact.utils.augmentations import FastBaseTransform
+from yolact.utils.fuse_img_outputs import fuse_outputs
 from yolact.layers.output_utils import postprocess
 from yolact.data import cfg, set_cfg
 
@@ -64,15 +65,19 @@ class YolactK:
         self.net.detect.use_cross_class_nms = False  # Whether compute NMS cross-class or per-class
         cfg.mask_proto_debug = False  # Outputs stuff for scripts/compute_mask.py
 
-    def inference(self, imgs: np.ndarray, img_paths: Optional[Union[list[Path], Path]] = None) -> np.ndarray:
-        """
+    def inference(self, imgs: np.ndarray, img_paths: Optional[Union[list[Path], Path]] = None,
+                  fuse_results: bool = False) -> np.ndarray:
+        """ Runs a batch of images through the network to detect the centers of each fiber.
 
         Args:
             imgs (np.ndarray): Either an image or a batch of images.
             img_paths (list, optional): If saving the result(s) as (an) image(s),
                                         should be the path(s) corresponding to the image(s).
-        Returns:
+            fuse_results (bool): If True then considers that the imgs are frames of a common video and
+                                 fuse the results of each frame into a single output.
 
+        Returns:
+            list: A list with the detected centers for each frame (or the fused centers)
         """
         # Handle case where input is not a batch
         if imgs.ndim == 3:
@@ -169,8 +174,8 @@ class YolactK:
                     if self.verbose:
                         print(f"{center=}")
 
-                    point_size = 3
                     if self.output_dir_path:
+                        point_size = 3
                         # Add closest point on image
                         img = cv2.circle(img, (closest_point[1], closest_point[0]), point_size, (0, 255, 0), point_size)
                         # Add line end point
