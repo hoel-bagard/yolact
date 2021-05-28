@@ -49,9 +49,9 @@ def fuse_outputs(masks_list: list[np.ndarray], iou_threshold: float = 0.1) -> np
     # Compute the new bounding boxes
     bboxes = []
     for mask in fused_masks:
-        contours, _ = cv2.findContours(mask.copy(), 1, 1)  # TODO: check if true. not copying here will throw an error
-        rect = cv2.minAreaRect(contours[0])
-        (x, y), (w, h), a = rect
-        bboxes.append([x, y, w, h])
+        mask = np.expand_dims(mask, -1).astype(np.uint8)
+        contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        x, y, w, h = cv2.boundingRect(contours[0])
+        bboxes.append([int(x), int(y), int(w), int(h)])
 
     return fused_masks, bboxes

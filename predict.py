@@ -99,7 +99,7 @@ class YolactK:
             imgs_masks, imgs_bboxes = fuse_outputs(imgs_masks)
 
         result: list[list[tuple[int, int]]] = []   # List with all the detected centers for each image.
-        for i in range(len(imgs)):
+        for i, (img, img_path) in enumerate(zip(imgs, img_paths)):
             bboxes = imgs_bboxes if fuse_results else imgs_bboxes[i]
             masks = imgs_masks if fuse_results else imgs_masks[i]
 
@@ -115,6 +115,7 @@ class YolactK:
 
                 closest_point, end_point, center_point = self.get_points(masks[detection_index], bb_center)
 
+                # TODO: put the draw fn back in the loop to remove the lists
                 closest_points.append(center_point)
                 end_points.append(center_point)
                 center_points.append(center_point)
@@ -123,7 +124,7 @@ class YolactK:
             result.append(center_points)
 
             if self.output_dir_path:
-                self.draw_on_image(img, img_path, bboxes, masks, closest_points, end_points, center_points)
+                self.draw_on_image(img, img_path, bboxes, masks, closest_points, end_points, center_points, bb_centers)
 
         return result
 
@@ -151,7 +152,7 @@ class YolactK:
             # Add found center
             img = cv2.circle(img, (center_point[1], center_point[0]), point_size, (255, 0, 0), point_size)
             # Add bounding box center
-            img = cv2.circle(img, (bb_center, bb_center), point_size, (0, 0, 0), point_size)
+            img = cv2.circle(img, (bb_center[0], bb_center[1]), point_size, (0, 0, 0), point_size)
         cv2.imwrite(str(output_path), img)
 
     def run_network(self, img: np.ndarray):
@@ -210,7 +211,7 @@ class YolactK:
         if closest_point == (center_y, center_x):
             if self.verbose:
                 print("Bounding box's center was already on the mask")
-            center = end_point = closest_point
+            center_point = end_point = closest_point
         # Otherwise, "trace" a line going through the bounding box's center and the closest point on the
         # mask. We start inspecting that line from the closest point and in the direction going away from
         # the bounding box's center. Stops when the line goes out of the mask.
@@ -236,7 +237,7 @@ class YolactK:
             end_point = closest_point + (line_dir * mult_factor).astype(int)
 
         if self.verbose:
-            print(f"{center=}")
+            print(f"{center_point=}")
 
         return closest_point, end_point, center_point
 
@@ -249,6 +250,8 @@ def main():
     parser.add_argument("--output_dir_path", "--o", type=Path, default=None, help="Path to an output dir to get images")
     parser.add_argument("--use_gpu", "--gpu", action="store_true", help="Use cuda.")
     parser.add_argument("--verbose", "--v", action="store_true", help="Use for debug.")
+    parser.add_argument("--fuse", "--f", action="store_true", help="All the images are from the same video,"
+                                                                   "fuses the results.")
     args = parser.parse_args()
 
     data_path: Path = args.data_path
@@ -257,13 +260,23 @@ def main():
                        use_gpu=args.use_gpu, verbose=args.verbose)
     exts = [".jpg", ".png"]
     img_paths = list([p for p in data_path.rglob("*") if p.suffix in exts])
-    nb_imgs = len(img_paths)
-    for img_index, img_path in enumerate(img_paths):
-        clean_print(f"Processing image: {img_path} ({img_index+1}/{nb_imgs})", end="\n" if args.verbose else "\r")
-        img = cv2.imread(str(img_path))
-        centers = yolact_k.inference(img, img_path)
+
+    if args.fuse:
+        imgs = []
+        for img_path in img_paths:
+            img = cv2.imread(str(img_path))
+            imgs.append(img)
+        centers = yolact_k.inference(np.asarray(imgs), img_paths, fuse_results=args.fuse)
         if args.verbose:
-            print(f"Centers for img {img_path}: {centers}")
+            print(f"centers for the video: {centers}")
+    else:
+        nb_imgs = len(img_paths)
+        for img_index, img_path in enumerate(img_paths):
+            clean_print(f"processing image: {img_path} ({img_index+1}/{nb_imgs})", end="\n" if args.verbose else "\r")
+            img = cv2.imread(str(img_path))
+            centers = yolact_k.inference(img, img_path)
+            if args.verbose:
+                print(f"centers for img {img_path}: {centers}")
 
 
 if __name__ == "__main__":
