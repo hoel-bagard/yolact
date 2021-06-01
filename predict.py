@@ -121,7 +121,9 @@ class YolactK:
                 center_points.append(center_point)
                 bb_centers.append(bb_center)
 
-            result.append(center_points)
+            # Do not duplicate the predictions when fusing results
+            if not fuse_results or i == 0:
+                result.append(center_points)
 
             if self.output_dir_path:
                 self.draw_on_image(img, img_path, bboxes, masks, closest_points, end_points, center_points, bb_centers)
@@ -268,7 +270,7 @@ def main():
             imgs.append(img)
         centers = yolact_k.inference(np.asarray(imgs), img_paths, fuse_results=args.fuse)
         if args.verbose:
-            print(f"centers for the video: {centers}")
+            print(f"centers for the video: {centers}\n(Number of centers: {len(centers[0])}")
     else:
         nb_imgs = len(img_paths)
         for img_index, img_path in enumerate(img_paths):
@@ -276,7 +278,7 @@ def main():
             img = cv2.imread(str(img_path))
             centers = yolact_k.inference(img, img_path)
             if args.verbose:
-                print(f"centers for img {img_path}: {centers}")
+                print(f"Centers for img {img_path}: {centers}\n(Number of centers: {len(centers)}")
 
 
 if __name__ == "__main__":
