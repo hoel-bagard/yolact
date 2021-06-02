@@ -27,8 +27,10 @@ def fuse_outputs(masks_list: list[np.ndarray], iou_threshold: float = 0.0001) ->
     # # Give an id to each fiber, by starting with the image with highest average fiber size.
     # start_frame_idx = np.argmax(avg_sizes)
 
-    # Start with the frame with the least detections
-    start_frame_idx = np.argmin([len(frame_masks) for frame_masks in masks_list])
+    # Start with the frame with the least detections (Exluding frames with no detections)
+    nb_detected_per_frame = np.asarray([len(frame_masks) for frame_masks in masks_list])
+    valid_idx = np.where(nb_detected_per_frame > 0)[0]
+    start_frame_idx = valid_idx[nb_detected_per_frame[valid_idx].argmin()]
 
     fused_masks = masks_list[start_frame_idx]
 
