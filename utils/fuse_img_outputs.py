@@ -29,6 +29,9 @@ def fuse_outputs(masks_list: list[np.ndarray], iou_threshold: float = 0.0001) ->
 
     # Start with the frame with the least detections (Exluding frames with no detections)
     nb_detected_per_frame = np.asarray([len(frame_masks) for frame_masks in masks_list])
+    # If the AI did not detect anything, return empty arrays
+    if np.all(nb_detected_per_frame == 0):
+        return [], []
     valid_idx = np.where(nb_detected_per_frame > 0)[0]
     start_frame_idx = valid_idx[nb_detected_per_frame[valid_idx].argmin()]
 
