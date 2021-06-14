@@ -4,9 +4,9 @@ import torch.nn.functional as F
 import numpy as np
 import cv2
 
-from ..data import cfg, mask_type, MEANS, STD, activation_func
-from ..utils import timer
-from .box_utils import crop, sanitize_coordinates
+from yolact.data import cfg, mask_type, MEANS, STD, activation_func
+from yolact.utils import timer
+from yolact.layers.box_utils import crop, sanitize_coordinates
 
 
 def postprocess(det_output, w, h, batch_idx=0, interpolation_mode='bilinear',
@@ -34,7 +34,7 @@ def postprocess(det_output, w, h, batch_idx=0, interpolation_mode='bilinear',
     dets = dets['detection']
 
     if dets is None:
-        return [torch.Tensor()] * 4 # Warning, this is 4 copies of the same thing
+        return [torch.Tensor()] * 4  # Warning, this is 4 copies of the same thing
 
     if score_threshold > 0:
         keep = dets['score'] > score_threshold
@@ -48,9 +48,9 @@ def postprocess(det_output, w, h, batch_idx=0, interpolation_mode='bilinear',
 
     # Actually extract everything from dets now
     classes = dets['class']
-    boxes   = dets['box']
-    scores  = dets['score']
-    masks   = dets['mask']
+    boxes = dets['box']
+    scores = dets['score']
+    masks = dets['mask']
 
     if cfg.mask_type == mask_type.lincomb and cfg.eval_mask_branch:
         # At this points masks is only the coefficients

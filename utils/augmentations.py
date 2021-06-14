@@ -7,7 +7,7 @@ from numpy import random
 import torch
 import torch.nn.functional as F
 
-from ..data import cfg, MEANS, STD
+from yolact.data import cfg, MEANS, STD
 
 
 def intersect(box_a, box_b):

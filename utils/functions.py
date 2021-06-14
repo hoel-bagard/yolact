@@ -5,7 +5,7 @@ from pathlib import Path
 
 import torch.nn as nn
 
-from ..layers.interpolate import InterpolateModule
+from yolact.layers.interpolate import InterpolateModule
 
 
 class MovingAverage():
