@@ -472,7 +472,7 @@ class Yolact(nn.Module):
     def save_weights(self, path):
         """ Saves the model's weights using compression because the file sizes were getting too big. """
         torch.save(self.state_dict(), path)
-    
+
     def load_weights(self, path):
         """ Loads weights from a compressed save file. """
         state_dict = torch.load(path)
@@ -481,7 +481,7 @@ class Yolact(nn.Module):
         for key in list(state_dict.keys()):
             if key.startswith('backbone.layer') and not key.startswith('backbone.layers'):
                 del state_dict[key]
-        
+
             # Also for backward compatibility with v1.0 weights, do this check
             if key.startswith('fpn.downsample_layers.'):
                 if cfg.fpn is not None and int(key.split('.')[2]) >= cfg.fpn.num_downsample:
@@ -494,7 +494,7 @@ class Yolact(nn.Module):
         self.backbone.init_backbone(backbone_path)
 
         conv_constants = getattr(nn.Conv2d(1, 1, 1), '__constants__')
-        
+
         # Quick lambda to test if one list contains the other
         def all_in(x, y):
             for _x in x:
@@ -518,7 +518,7 @@ class Yolact(nn.Module):
                     is_script_conv = (
                         all_in(module.__dict__['_constants_set'], conv_constants)
                         and all_in(conv_constants, module.__dict__['_constants_set']))
-            
+
             is_conv_layer = isinstance(module, nn.Conv2d) or is_script_conv
 
             if is_conv_layer and module not in self.backbone.backbone_modules:
