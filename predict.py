@@ -1,27 +1,29 @@
+import time
 from argparse import ArgumentParser
 from pathlib import Path
 from shutil import get_terminal_size
-from typing import Optional, Union, Tuple
-import time
+from typing import Optional
 
 import cv2
-import torch
 import numpy as np
+import numpy.typing as npt
+import torch
 
-from yolact.yolact_net import Yolact
+from yolact.data import cfg, set_cfg
+from yolact.layers.output_utils import postprocess
 from yolact.utils.augmentations import FastBaseTransform
 from yolact.utils.fuse_img_outputs import fuse_outputs
-from yolact.layers.output_utils import postprocess
-from yolact.data import cfg, set_cfg
+from yolact.yolact_net import Yolact
 
 
-def clean_print(msg: str, fallback: Optional[Tuple[int, int]] = (156, 38), end='\n'):
-    """ Function that prints the given string to the console and erases any previous print made on the same line
+def clean_print(msg: str, fallback: Optional[tuple[int, int]] = (156, 38), end='\n'):
+    """Function that prints the given string to the console and erases any previous print made on the same line.
 
     Args:
         msg (str): String to print to the console
         fallback (tuple, optional): Size of the terminal to use if it cannot be determined by shutil
                                     (if using windows for example)
+        end: End character.
     """
     print(msg + ' ' * (get_terminal_size(fallback=fallback).columns - len(msg)), end=end, flush=True)
 
@@ -34,11 +36,12 @@ class YolactK:
                  use_gpu: bool = True,
                  verbose: bool = False,
                  show_timing_perf: bool = False):
-        """
+        """YolactK.
+
         Args:
             checkpoint_path (Path): Path to the checkpoint to use.
             config (str): The config to use
-            output_dir_path (Path, Optional):
+            output_dir_path (Path, Optional): ?
             use_gpu (bool): Controls wether to use a gpu or not
             verbose (bool): If true then prints information useful for debugging
             show_timing_perf (bool): If true then prints then time each operation takes
@@ -68,9 +71,11 @@ class YolactK:
         self.net.detect.use_cross_class_nms = False  # Whether compute NMS cross-class or per-class
         cfg.mask_proto_debug = False  # Outputs stuff for scripts/compute_mask.py
 
-    def inference(self, imgs: np.ndarray, img_paths: Optional[Union[list[Path], Path]] = None,
+    def inference(self,
+                  imgs: np.ndarray,
+                  img_paths: Optional[list[Path] | Path] = None,
                   fuse_results: bool = False) -> np.ndarray:
-        """ Runs a batch of images through the network to detect the centers of each fiber.
+        """Runs a batch of images through the network to detect the centers of each fiber.
 
         Args:
             imgs (np.ndarray): Either an image or a batch of images.
@@ -95,7 +100,7 @@ class YolactK:
 
         imgs_masks, imgs_bboxes = [], []
         with torch.no_grad():
-            for img, img_path in zip(imgs, img_paths):
+            for img in imgs:
                 masks, bboxes = self.run_network(img)
                 imgs_masks.append(masks)
                 imgs_bboxes.append(bboxes)
@@ -147,8 +152,8 @@ class YolactK:
 
     def draw_on_image(self, img: np.ndarray, bbox: np.ndarray, mask: np.ndarray,
                       closest_point: tuple[int, int], end_point: tuple[int, int],
-                      center_point: tuple[int, int], bb_center: tuple[int, int]) -> None:
-        """ Draws the bboxes, masks and points of interest on the image and then returns it. """
+                      center_point: tuple[int, int], bb_center: tuple[int, int]) -> npt.NDArray[np.uint8]:
+        """Draws the bboxes, masks and points of interest on the image and then returns it."""
         point_size = 3
 
         # Add the bounging box to the image
@@ -171,7 +176,7 @@ class YolactK:
         return img
 
     def run_network(self, img: np.ndarray):
-        """ Runs an image through the network + postprocessing and returns the masks and bboxes
+        """Runs an image through the network + postprocessing and returns the masks and bboxes.
 
         Args:
             img (np.ndarray): The image to process.
@@ -186,7 +191,7 @@ class YolactK:
         h, w, _ = img.shape
 
         # Post process
-        t = postprocess(preds, w, h, visualize_lincomb=True, crop_masks=True, score_threshold=0.15)
+        t = postprocess(preds, w, h, visualize_lincomb=False, crop_masks=True, score_threshold=0.15)
         top_k = 15  # Further restrict the number of predictions to parse
         idx = t[1].argsort(0, descending=True)[:top_k]
         masks = t[3][idx].cpu().numpy()
@@ -197,12 +202,14 @@ class YolactK:
     def get_points(self, mask: np.ndarray, bb_center: tuple[int, int]) -> tuple[tuple[int, int],
                                                                                 tuple[int, int],
                                                                                 tuple[int, int]]:
-        """
+        """Compute points of interest from a mask and a bounding box.
+
         From a mask and the center of its bounding box, computes three points of interest:
             - The closest point from the center of the bounding box that is on the mask
             - The point that is the furthest from the bb center while being on the mask and on the line going through
               the bounding box center and the first point
             - The middle point between the two previous points
+
         Args:
             mask (np.ndarray): The mask to process.
             bb_center (tuple): The center of the mask's bounding box

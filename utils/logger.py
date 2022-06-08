@@ -361,12 +361,12 @@ class LogVisualizer():
 
                         if len(avg) < smoothness // 10:
                             continue
-                        
+
                     _x.append(val_x)
                     _y.append(val_y)
-            
+
             plt.plot(_x, _y, color=self._color(idx), label=name)
-        
+
         plt.title(y.replace('x.', entry_type + '.'))
         plt.legend()
         plt.grid(linestyle=':', linewidth=0.5)
