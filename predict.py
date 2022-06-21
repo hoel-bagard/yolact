@@ -46,8 +46,7 @@ class YolactK:
             verbose (bool): If true then prints information useful for debugging
             show_timing_perf (bool): If true then prints then time each operation takes
         """
-        if output_dir_path:
-            output_dir_path: Path = output_dir_path
+        if output_dir_path is not None:
             output_dir_path.mkdir(parents=True, exist_ok=True)
         self.output_dir_path = output_dir_path
         self.verbose = verbose
@@ -92,11 +91,14 @@ class YolactK:
         # Handle case where input is not a batch
         if imgs.ndim == 3:
             imgs = np.expand_dims(imgs, axis=0)
-            img_paths = np.expand_dims(img_paths, axis=0) if img_paths else None
         if self.output_dir_path:
             assert img_paths, "If saving results as images, the image paths must be provided"
         if img_paths is None:
             img_paths = list(np.arange(len(imgs)))
+        elif isinstance(img_paths, Path):
+            # If the images are frames of a video for example, then have the same name for all frame.
+            # Also functions as an expand_dims if using a single image.
+            img_paths = len(imgs) * [img_paths]
 
         imgs_masks, imgs_bboxes = [], []
         with torch.no_grad():
