@@ -165,12 +165,12 @@ my_custom_dataset = Config({
     'name': 'Client Dataset',
 
     # Training images and annotations
-    'train_images': "/home/hoel/k_client_name/data/preprocessed_datasets/split_dataset/train/images/",
-    'train_info':   "/home/hoel/k_client_name/data/preprocessed_datasets/split_dataset/train/annotations.json",
+    'train_images': "../data/preprocessed_datasets/split_dataset/train/images/",
+    'train_info':   "../data/preprocessed_datasets/split_dataset/train/annotations.json",
 
     # Validation images and annotations.
-    'valid_images': "/home/hoel/k_client_name/data/preprocessed_datasets/split_dataset/validation/images/",
-    'valid_info':   "/home/hoel/k_client_name/data/preprocessed_datasets/split_dataset/validation/annotations.json",
+    'valid_images': "../data/preprocessed_datasets/split_dataset/validation/images/",
+    'valid_info':   "../data/preprocessed_datasets/split_dataset/validation/annotations.json",
 
     # Path for first (working) train
     # 'train_images': "/home/hoel/k_client_name/data/1-old_datasets/first_dataset_resized/train/images/",
