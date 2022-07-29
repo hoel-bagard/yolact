@@ -167,7 +167,7 @@ class PredictionModule(nn.Module):
 
         bbox = src.bbox_layer(bbox_x).permute(0, 2, 3, 1).contiguous().view(x.size(0), -1, 4)
         conf = src.conf_layer(conf_x).permute(0, 2, 3, 1).contiguous().view(x.size(0), -1, self.num_classes)
-        
+
         if cfg.eval_mask_branch:
             mask = src.mask_layer(mask_x).permute(0, 2, 3, 1).contiguous().view(x.size(0), -1, self.mask_dim)
         else:
@@ -177,7 +177,7 @@ class PredictionModule(nn.Module):
             score = src.score_layer(x).permute(0, 2, 3, 1).contiguous().view(x.size(0), -1, 1)
 
         if cfg.use_instance_coeff:
-            inst = src.inst_layer(x).permute(0, 2, 3, 1).contiguous().view(x.size(0), -1, cfg.num_instance_coeffs)    
+            inst = src.inst_layer(x).permute(0, 2, 3, 1).contiguous().view(x.size(0), -1, cfg.num_instance_coeffs)
 
         # See box_utils.decode for an explanation of this
         if cfg.use_yolo_regressors:
@@ -197,7 +197,7 @@ class PredictionModule(nn.Module):
 
         if cfg.mask_proto_split_prototypes_by_head and cfg.mask_type == mask_type.lincomb:
             mask = F.pad(mask, (self.index * self.mask_dim, (self.num_heads - self.index - 1) * self.mask_dim), mode='constant', value=0)
-        
+
         priors = self.make_priors(conv_h, conv_w, x.device)
 
         preds = { 'loc': bbox, 'conf': conf, 'mask': mask, 'priors': priors }
@@ -207,7 +207,7 @@ class PredictionModule(nn.Module):
 
         if cfg.use_instance_coeff:
             preds['inst'] = inst
-        
+
         return preds
 
     def make_priors(self, conv_h, conv_w, device):
@@ -224,7 +224,7 @@ class PredictionModule(nn.Module):
                     # +0.5 because priors are in center-size notation
                     x = (i + 0.5) / conv_w
                     y = (j + 0.5) / conv_h
-                    
+
                     for ars in self.aspect_ratios:
                         for scale in self.scales:
                             for ar in ars:
@@ -237,7 +237,7 @@ class PredictionModule(nn.Module):
                                 else:
                                     w = scale * ar / conv_w
                                     h = scale / ar / conv_h
-                                
+
                                 # This is for backward compatability with a bug where I made everything square by accident
                                 if cfg.backbone.use_square_anchors:
                                     h = w
@@ -253,12 +253,12 @@ class PredictionModule(nn.Module):
                 # This whole weird situation is so that DataParalell doesn't copy the priors each iteration
                 if prior_cache[size] is None:
                     prior_cache[size] = {}
-                
+
                 if device not in prior_cache[size]:
                     prior_cache[size][device] = self.priors.to(device)
 
                 self.priors = prior_cache[size][device]
-        
+
         return self.priors
 
 class FPN(ScriptModuleWrapper):
@@ -299,7 +299,7 @@ class FPN(ScriptModuleWrapper):
                 nn.Conv2d(cfg.fpn.num_features, cfg.fpn.num_features, kernel_size=3, padding=1, stride=2)
                 for _ in range(cfg.fpn.num_downsample)
             ])
-        
+
         self.interpolation_mode     = cfg.fpn.interpolation_mode
         self.num_downsample         = cfg.fpn.num_downsample
         self.use_conv_downsample    = cfg.fpn.use_conv_downsample
@@ -414,7 +414,7 @@ class Yolact(nn.Module):
                 self.num_grids = 0
 
             self.proto_src = cfg.mask_proto_src
-            
+
             if self.proto_src is None: in_channels = 3
             elif cfg.fpn is not None: in_channels = cfg.fpn.num_features
             else: in_channels = self.backbone.channels[self.proto_src]
@@ -425,7 +425,6 @@ class Yolact(nn.Module):
 
             if cfg.mask_proto_bias:
                 cfg.mask_dim += 1
-
 
         self.selected_layers = cfg.backbone.selected_layers
         src_channels = self.backbone.channels
@@ -439,7 +438,6 @@ class Yolact(nn.Module):
             self.selected_layers = list(range(len(self.selected_layers) + cfg.fpn.num_downsample))
             src_channels = [cfg.fpn.num_features] * len(self.selected_layers)
 
-
         self.prediction_layers = nn.ModuleList()
         cfg.num_heads = len(self.selected_layers)
 
@@ -450,10 +448,10 @@ class Yolact(nn.Module):
                 parent = self.prediction_layers[0]
 
             pred = PredictionModule(src_channels[layer_idx], src_channels[layer_idx],
-                                    aspect_ratios = cfg.backbone.pred_aspect_ratios[idx],
-                                    scales        = cfg.backbone.pred_scales[idx],
-                                    parent        = parent,
-                                    index         = idx)
+                                    aspect_ratios=cfg.backbone.pred_aspect_ratios[idx],
+                                    scales=cfg.backbone.pred_scales[idx],
+                                    parent=parent,
+                                    index=idx)
             self.prediction_layers.append(pred)
 
         # Extra parameters for the extra losses
@@ -461,7 +459,7 @@ class Yolact(nn.Module):
             # This comes from the smallest layer selected
             # Also note that cfg.num_classes includes background
             self.class_existence_fc = nn.Linear(src_channels[-1], cfg.num_classes - 1)
-        
+
         if cfg.use_semantic_segmentation_loss:
             self.semantic_seg_conv = nn.Conv2d(src_channels[0], cfg.num_classes-1, kernel_size=1)
 
@@ -544,7 +542,7 @@ class Yolact(nn.Module):
                             module.bias.data[1:] = -np.log((1 - cfg.focal_loss_init_pi) / cfg.focal_loss_init_pi)
                     else:
                         module.bias.data.zero_()
-    
+
     def train(self, mode=True):
         super().train(mode)
 
