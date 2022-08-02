@@ -73,7 +73,8 @@ class YolactK:
     def inference(self,
                   imgs: np.ndarray,
                   img_paths: Optional[list[Path] | Path] = None,
-                  fuse_results: bool = False) -> np.ndarray:
+                  fuse_results: bool = False,
+                  threshold: Optional[int] = None) -> np.ndarray:
         """Runs a batch of images through the network to detect the centers of each fiber.
 
         Args:
@@ -82,6 +83,8 @@ class YolactK:
                                         should be the path(s) corresponding to the image(s).
             fuse_results (bool): If True then considers that the imgs are frames of a common video and
                                  fuse the results of each frame into a single output.
+            threshold: If given, then any mask (and accompanying bounding box) whose area is below the threshold
+                       will be dropped.
 
         Returns:
             list: A list with the detected centers for each frame (or the fused centers)
@@ -129,6 +132,12 @@ class YolactK:
                 # Make sure that the bounding boxes are not going outside the image
                 width = min(width, img.shape[0] - top_x)
                 height = min(height, img.shape[1] - top_y)
+
+                # Optionally drop the detections that are too small.
+                if threshold is not None:
+                    if np.sum(masks[j]) < threshold:
+                        continue
+
                 bb_center = (top_x + width//2, top_y + height//2)
                 if self.verbose:
                     print(f"bounding box center: {bb_center}")
