@@ -4,7 +4,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from yolact.data import MEANS, STD, activation_func, cfg, mask_type
+from yolact.data import activation_func, cfg, mask_type, MEANS, STD
 from yolact.layers.box_utils import crop, sanitize_coordinates
 from yolact.utils import timer
 

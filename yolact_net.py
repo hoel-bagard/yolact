@@ -13,7 +13,7 @@ from yolact.backbone import construct_backbone
 from yolact.data.config import cfg, mask_type
 from yolact.layers import Detect
 from yolact.utils import timer
-from yolact.utils.functions import MovingAverage, make_net
+from yolact.utils.functions import make_net, MovingAverage
 
 # This is required for Pytorch 1.0.1 on Windows to initialize Cuda on some driver versions.
 # See the bug report here: https://github.com/pytorch/pytorch/issues/17108

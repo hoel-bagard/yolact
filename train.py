@@ -11,11 +11,11 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data as data
+from data import *
+from data import set_cfg, set_dataset
 from layers.modules import MultiBoxLoss
 from yolact_net import Yolact
 
-from data import *
-from data import set_cfg, set_dataset
 from utils import timer
 from utils.augmentations import BaseTransform, SSDAugmentation
 from utils.functions import MovingAverage, SavePath

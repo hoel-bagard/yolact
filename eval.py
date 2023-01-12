@@ -4,7 +4,7 @@ import os
 import pickle
 import random
 import time
-from collections import OrderedDict, defaultdict
+from collections import defaultdict, OrderedDict
 from pathlib import Path
 
 import cv2
@@ -13,13 +13,12 @@ import numpy as np
 import pycocotools
 import torch
 import torch.backends.cudnn as cudnn
+from data import cfg, COCODetection, COLORS, get_label_map, set_cfg, set_dataset
 from layers.box_utils import jaccard, mask_iou
 from layers.output_utils import postprocess, undo_image_transformation
 from torch.autograd import Variable
 from yolact_net import Yolact
 
-from data import (COLORS, COCODetection, cfg, get_label_map, set_cfg,
-                  set_dataset)
 from utils import timer
 from utils.augmentations import BaseTransform, FastBaseTransform
 from utils.functions import MovingAverage, ProgressBar, SavePath

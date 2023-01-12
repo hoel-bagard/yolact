@@ -5,8 +5,7 @@ import time
 
 import torch
 import torch.nn as nn
-from dcn_v2 import (DCN, DCNPooling, DCNv2, DCNv2Pooling, dcn_v2_conv,
-                    dcn_v2_pooling)
+from dcn_v2 import DCN, dcn_v2_conv, dcn_v2_pooling, DCNPooling, DCNv2, DCNv2Pooling
 from torch.autograd import gradcheck
 
 deformable_groups = 1

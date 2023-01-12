@@ -1,0 +1,10 @@
+[tool.pytest.ini_options]
+# https://docs.pytest.org/en/7.1.x/explanation/goodpractices.html
+addopts = [
+    "--import-mode=importlib",
+]
+
+[tool.isort]
+line_length = 120
+case_sensitive = false
+order_by_type = false
