@@ -46,8 +46,6 @@ class YolactK:
             verbose (bool): If true then prints information useful for debugging
             show_timing_perf (bool): If true then prints then time each operation takes
         """
-        if output_dir_path is not None:
-            output_dir_path.mkdir(parents=True, exist_ok=True)
         self.output_dir_path = output_dir_path
         self.verbose = verbose
         self.show_timing_perf = show_timing_perf
@@ -150,6 +148,7 @@ class YolactK:
                                              closest_point, end_point, center_point, bb_center)
 
             if self.output_dir_path:
+                self.output_dir_path.mkdir(parents=True, exist_ok=True)
                 output_path = (self.output_dir_path / img_path.name).with_suffix(".png")
                 cv2.imwrite(str(output_path), img)
             # Do not duplicate the predictions when fusing results
