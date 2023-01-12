@@ -1,30 +1,28 @@
 import argparse
-import time
-import random
-import pickle
 import json
 import os
-from collections import defaultdict
+import pickle
+import random
+import time
+from collections import OrderedDict, defaultdict
 from pathlib import Path
-from collections import OrderedDict
 
-from data import cfg, set_cfg, set_dataset
+import cv2
+import matplotlib.pyplot as plt
 import numpy as np
+import pycocotools
 import torch
 import torch.backends.cudnn as cudnn
-from torch.autograd import Variable
-import matplotlib.pyplot as plt
-import cv2
-import pycocotools
-
-from data import COCODetection, get_label_map, COLORS
-from yolact_net import Yolact
-from utils.augmentations import BaseTransform, FastBaseTransform
-from utils.functions import MovingAverage, ProgressBar
 from layers.box_utils import jaccard, mask_iou
-from utils import timer
-from utils.functions import SavePath
 from layers.output_utils import postprocess, undo_image_transformation
+from torch.autograd import Variable
+from yolact_net import Yolact
+
+from data import (COLORS, COCODetection, cfg, get_label_map, set_cfg,
+                  set_dataset)
+from utils import timer
+from utils.augmentations import BaseTransform, FastBaseTransform
+from utils.functions import MovingAverage, ProgressBar, SavePath
 
 
 def str2bool(v):
@@ -623,6 +621,7 @@ def evalimages(net: Yolact, input_folder: str, output_folder: str):
 
 from multiprocessing.pool import ThreadPool
 from queue import Queue
+
 
 class CustomDataParallel(torch.nn.DataParallel):
     """ A Custom Data Parallel class that properly gathers lists of dictionaries. """

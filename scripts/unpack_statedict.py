@@ -1,5 +1,7 @@
+import os
+import sys
+
 import torch
-import sys, os
 
 # Usage python scripts/unpack_statedict.py path_to_pth out_folder/
 # Make sure to include that slash after your out folder, since I can't

@@ -1,13 +1,13 @@
-from math import sqrt
 import types
+from math import sqrt
 
 import cv2
 import numpy as np
-from numpy import random
 import torch
 import torch.nn.functional as F
+from numpy import random
 
-from yolact.data import cfg, MEANS, STD
+from yolact.data import MEANS, STD, cfg
 
 
 def intersect(box_a, box_b):

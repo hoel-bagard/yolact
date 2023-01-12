@@ -1,16 +1,14 @@
 #!/usr/bin/env python
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import division
+from __future__ import absolute_import, division, print_function
 
 import math
+
+import _ext as _backend
 import torch
 from torch import nn
 from torch.autograd import Function
-from torch.nn.modules.utils import _pair
 from torch.autograd.function import once_differentiable
-
-import _ext as _backend
+from torch.nn.modules.utils import _pair
 
 
 class _DCNv2(Function):

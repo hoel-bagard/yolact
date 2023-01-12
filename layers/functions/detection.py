@@ -1,9 +1,9 @@
 import numpy as np
 import torch
 
-from yolact.utils import timer
 from yolact.data import cfg
 from yolact.layers.box_utils import decode, jaccard
+from yolact.utils import timer
 
 
 class Detect(object):

@@ -9,7 +9,6 @@ import argparse
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 
-
 parser = argparse.ArgumentParser(description='COCO Detections Evaluator')
 parser.add_argument('--bbox_det_file', default='results/bbox_detections.json', type=str)
 parser.add_argument('--mask_det_file', default='results/mask_detections.json', type=str)

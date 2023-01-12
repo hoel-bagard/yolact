@@ -1,24 +1,25 @@
-from data import *
-from data import set_cfg, set_dataset
-from utils.augmentations import SSDAugmentation, BaseTransform
-from utils.functions import MovingAverage, SavePath
-from utils.logger import Log
-from utils import timer
-from layers.modules import MultiBoxLoss
-from yolact_net import Yolact
-import os
-import time
+import argparse
+import datetime
 import math
+import os
 import random
+import time
+
+# Oof
+import eval as eval_script
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data as data
-import argparse
-import datetime
+from layers.modules import MultiBoxLoss
+from yolact_net import Yolact
 
-# Oof
-import eval as eval_script
+from data import *
+from data import set_cfg, set_dataset
+from utils import timer
+from utils.augmentations import BaseTransform, SSDAugmentation
+from utils.functions import MovingAverage, SavePath
+from utils.logger import Log
 
 
 def str2bool(v):

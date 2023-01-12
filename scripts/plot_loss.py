@@ -1,4 +1,7 @@
-import re, sys, os
+import os
+import re
+import sys
+
 import matplotlib.pyplot as plt
 
 from utils.functions import MovingAverage

@@ -1,17 +1,17 @@
+from collections import defaultdict
 from itertools import product
 from math import sqrt
 from typing import List
-from collections import defaultdict
 
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchvision.models.resnet import Bottleneck
-import numpy as np
 
+from yolact.backbone import construct_backbone
 from yolact.data.config import cfg, mask_type
 from yolact.layers import Detect
-from yolact.backbone import construct_backbone
 from yolact.utils import timer
 from yolact.utils.functions import MovingAverage, make_net
 

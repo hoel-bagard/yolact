@@ -1,6 +1,6 @@
-from backbone import DarkNetBackbone
 import h5py
 import torch
+from backbone import DarkNetBackbone
 
 f = h5py.File('darknet53.h5', 'r')
 m = f['model_weights']

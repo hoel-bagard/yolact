@@ -1,9 +1,9 @@
-import numpy as np
-import math, random
+import math
+import random
 
 import matplotlib.pyplot as plt
-from matplotlib.widgets import Slider, Button
-
+import numpy as np
+from matplotlib.widgets import Button, Slider
 
 fig, ax = plt.subplots()
 plt.subplots_adjust(bottom=0.24)

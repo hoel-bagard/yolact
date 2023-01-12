@@ -4,8 +4,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 
-from yolact.layers.box_utils import match, log_sum_exp, decode, center_size, crop, elemwise_box_iou
-from yolact.data import cfg, mask_type, activation_func
+from yolact.data import activation_func, cfg, mask_type
+from yolact.layers.box_utils import (center_size, crop, decode,
+                                     elemwise_box_iou, log_sum_exp, match)
 
 
 class MultiBoxLoss(nn.Module):

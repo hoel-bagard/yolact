@@ -1,6 +1,6 @@
-from http.server import SimpleHTTPRequestHandler, HTTPServer, HTTPStatus
-from pathlib import Path
 import os
+from http.server import HTTPServer, HTTPStatus, SimpleHTTPRequestHandler
+from pathlib import Path
 
 PORT = 6337
 IMAGE_PATH = '../data/coco/images/'

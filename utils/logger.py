@@ -1,22 +1,21 @@
-import os
-import json
-import time
-import sys
-
-from typing import Union
 import datetime
-
+import json
+import os
+import sys
+import time
 from collections import defaultdict
+from typing import Union
+
 import matplotlib.pyplot as plt
 import numpy as np
 
 # Because Python's package heierarchy system sucks
 if __name__ == '__main__':
-    from nvinfo import gpu_info, visible_gpus, nvsmi_available
     from functions import MovingAverage
+    from nvinfo import gpu_info, nvsmi_available, visible_gpus
 else:
-    from .nvinfo import gpu_info, visible_gpus, nvsmi_available
     from .functions import MovingAverage
+    from .nvinfo import gpu_info, nvsmi_available, visible_gpus
 
 class Log:
     """

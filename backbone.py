@@ -1,8 +1,8 @@
+import pickle
+from collections import OrderedDict
+
 import torch
 import torch.nn as nn
-import pickle
-
-from collections import OrderedDict
 
 try:
     from dcn_v2 import DCN

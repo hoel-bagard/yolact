@@ -9,8 +9,11 @@
 # --------------------------------------------------------
 
 cimport cython
+
 import numpy as np
+
 cimport numpy as np
+
 
 cdef inline np.float32_t max(np.float32_t a, np.float32_t b) nogil:
     return a if a >= b else b

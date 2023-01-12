@@ -1,12 +1,12 @@
 """ Contains functions used to sanitize and prepare the output of Yolact. """
+import cv2
+import numpy as np
 import torch
 import torch.nn.functional as F
-import numpy as np
-import cv2
 
-from yolact.data import cfg, mask_type, MEANS, STD, activation_func
-from yolact.utils import timer
+from yolact.data import MEANS, STD, activation_func, cfg, mask_type
 from yolact.layers.box_utils import crop, sanitize_coordinates
+from yolact.utils import timer
 
 
 def postprocess(det_output, w, h, batch_idx=0, interpolation_mode='bilinear',

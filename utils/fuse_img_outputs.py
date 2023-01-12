@@ -1,5 +1,5 @@
-import numpy as np
 import cv2
+import numpy as np
 
 
 def get_IOU(mask1: np.ndarray, mask2: np.ndarray) -> np.ndarray:

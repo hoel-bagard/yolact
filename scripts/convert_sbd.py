@@ -1,7 +1,11 @@
-import scipy.io, scipy.ndimage
-import os.path, json
-import pycocotools.mask
+import json
+import os.path
+
 import numpy as np
+import pycocotools.mask
+import scipy.io
+import scipy.ndimage
+
 
 def mask2bbox(mask):
     rows = np.any(mask, axis=1)

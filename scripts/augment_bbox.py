@@ -1,14 +1,14 @@
 
+import json
 import os.path as osp
-import json, pickle
+import pickle
 import sys
-from math import sqrt
 from itertools import product
-import torch
-from numpy import random
+from math import sqrt
 
 import numpy as np
-
+import torch
+from numpy import random
 
 max_image_size = 550
 augment_idx = 0
