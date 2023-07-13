@@ -58,15 +58,16 @@ def fuse_outputs(masks_list: list[np.ndarray], iou_threshold: float = 0.0001) ->
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         rectangles = [cv2.boundingRect(contour) for contour in contours]
-        rect = rectangles[0]
+        if len(rectangles) > 0:  # Not sure how, but somehow rectangles is sometimes empty.
+            rect = rectangles[0]
 
-        # Quick fix in case the mask is not a continuous blob
-        if len(rectangles) > 1:
-            for i in range(1, len(rectangles)):
-                rect = merge_rect(rect, rectangles[i])
+            # Quick fix in case the mask is not a continuous blob
+            if len(rectangles) > 1:
+                for i in range(1, len(rectangles)):
+                    rect = merge_rect(rect, rectangles[i])
 
-        x, y, w, h = rect
-        bboxes.append([int(x), int(y), int(w), int(h)])
+            x, y, w, h = rect
+            bboxes.append([int(x), int(y), int(w), int(h)])
 
     return fused_masks, bboxes
 
