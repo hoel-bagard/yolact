@@ -68,6 +68,8 @@ def fuse_outputs(masks_list: list[np.ndarray], iou_threshold: float = 0.0001) ->
 
             x, y, w, h = rect
             bboxes.append([int(x), int(y), int(w), int(h)])
+        else:
+            bboxes.append([0, 0, 10, 10])  # Temp fix to avoid a crash.
 
     return fused_masks, bboxes
 
